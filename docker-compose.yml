@@ -1,0 +1,35 @@
+version: '3.9'
+
+services:
+  # app:
+  #   build: .
+  #   container_name: nest-app
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     DB_HOST: db
+  #     DB_PORT: 5432
+  #     DB_USERNAME: postgres
+  #     DB_PASSWORD: postgres
+  #     DB_NAME: infra_assignment
+  #   depends_on:
+  #     - db
+  #   volumes:
+  #     - .:/app
+  #     - /app/node_modules
+
+  db:
+    image: postgres:14
+    container_name: nest-db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: infra_assignment
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
