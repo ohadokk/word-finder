@@ -44,6 +44,10 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => comment_entity_1.Comment, (comment) => comment.article),
     __metadata("design:type", Array)
 ], Article.prototype, "comments", void 0);
+__decorate([
+    (0, typeorm_1.Column)("jsonb", { nullable: false, default: {} }),
+    __metadata("design:type", Object)
+], Article.prototype, "wordFrequencies", void 0);
 exports.Article = Article = __decorate([
     (0, typeorm_1.Entity)()
 ], Article);

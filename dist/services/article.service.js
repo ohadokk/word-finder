@@ -37,11 +37,22 @@ let ArticleService = class ArticleService {
         }
         return map;
     }
+    buildWordFrequencyMap(body) {
+        const map = {};
+        const words = body.toLowerCase().match(/\b\w+\b/g) || [];
+        for (const word of words) {
+            map[word] = (map[word] || 0) + 1;
+        }
+        return map;
+    }
     async create(dto) {
         const author = await this.userRepo.findOneByOrFail({ id: dto.authorId });
         const wordOffsets = this.buildOffsetMap(dto.body);
-        const article = this.articleRepo.create(Object.assign(Object.assign({}, dto), { author, wordOffsets }));
-        return this.articleRepo.save(article);
+        const wordFrequencies = this.buildWordFrequencyMap(dto.body);
+        const article = this.articleRepo.create(Object.assign(Object.assign({}, dto), { author,
+            wordOffsets,
+            wordFrequencies }));
+        return await this.articleRepo.save(article);
     }
     async findOne(id) {
         return this.articleRepo.findOneByOrFail({ id });
@@ -63,6 +74,21 @@ let ArticleService = class ArticleService {
             }
         }
         return result;
+    }
+    async findMostCommon(word) {
+        var _a;
+        const wordLower = word.toLowerCase();
+        const articles = await this.articleRepo.find();
+        let maxCount = 0;
+        let result = null;
+        for (const article of articles) {
+            const count = ((_a = article.wordFrequencies) === null || _a === void 0 ? void 0 : _a[wordLower]) || 0;
+            if (count > maxCount) {
+                maxCount = count;
+                result = { article_id: article.id, count };
+            }
+        }
+        return result || { article_id: null, count: 0 };
     }
 };
 exports.ArticleService = ArticleService;

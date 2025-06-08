@@ -30,18 +30,7 @@ let ArticleController = class ArticleController {
         return this.articleService.findWords(words);
     }
     async findMostCommon(word) {
-        var _a;
-        const articles = await this.articleService.findAll();
-        const wordLower = word.toLowerCase();
-        let max = 0, articleId = null;
-        for (const article of articles) {
-            const count = ((_a = article.wordOffsets[wordLower]) === null || _a === void 0 ? void 0 : _a.length) || 0;
-            if (count > max) {
-                max = count;
-                articleId = article.id;
-            }
-        }
-        return { article_id: articleId, count: max };
+        return await this.articleService.findMostCommon(word);
     }
 };
 exports.ArticleController = ArticleController;

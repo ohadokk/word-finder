@@ -23,17 +23,6 @@ export class ArticleController {
 
   @Get("search/most-common")
   async findMostCommon(@Query("word") word: string) {
-    const articles = await this.articleService.findAll();
-    const wordLower = word.toLowerCase();
-    let max = 0,
-      articleId = null;
-    for (const article of articles) {
-      const count = article.wordOffsets[wordLower]?.length || 0;
-      if (count > max) {
-        max = count;
-        articleId = article.id;
-      }
-    }
-    return { article_id: articleId, count: max };
+    return await this.articleService.findMostCommon(word);
   }
 }

@@ -31,4 +31,7 @@ export class Article {
 
   @OneToMany(() => Comment, (comment: Comment) => comment.article)
   comments?: Comment[];
+
+  @Column("jsonb", { nullable: false, default: {} })
+  wordFrequencies!: Record<string, number>;
 }

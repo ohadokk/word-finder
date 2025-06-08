@@ -7,6 +7,7 @@ export declare class ArticleService {
     private userRepo;
     constructor(articleRepo: Repository<Article>, userRepo: Repository<User>);
     private buildOffsetMap;
+    private buildWordFrequencyMap;
     create(dto: CreateArticleDto): Promise<Article>;
     findOne(id: string): Promise<Article>;
     findAll(): Promise<Article[]>;
@@ -14,4 +15,11 @@ export declare class ArticleService {
         article_id: string;
         offsets: number[];
     }[]>>;
+    findMostCommon(word: string): Promise<{
+        article_id: string;
+        count: number;
+    } | {
+        article_id: null;
+        count: number;
+    }>;
 }

@@ -8,6 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
+const config_1 = require("@nestjs/config");
 const typeorm_1 = require("@nestjs/typeorm");
 const article_entity_1 = require("./entities/article.entity");
 const user_entity_1 = require("./entities/user.entity");
@@ -24,15 +25,20 @@ exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            typeorm_1.TypeOrmModule.forRoot({
-                type: "postgres",
-                host: "localhost",
-                port: 5432,
-                username: "postgres",
-                password: "postgres",
-                database: "infra_assignment",
-                autoLoadEntities: true,
-                synchronize: true,
+            config_1.ConfigModule.forRoot({ isGlobal: true }),
+            typeorm_1.TypeOrmModule.forRootAsync({
+                imports: [config_1.ConfigModule],
+                useFactory: (config) => ({
+                    type: "postgres",
+                    host: config.getOrThrow("POSTGRES_HOST"),
+                    port: config.getOrThrow("POSTGRES_PORT"),
+                    username: config.getOrThrow("POSTGRES_USER"),
+                    password: config.getOrThrow("POSTGRES_PASSWORD"),
+                    database: config.getOrThrow("POSTGRES_DB"),
+                    autoLoadEntities: true,
+                    synchronize: true,
+                }),
+                inject: [config_1.ConfigService],
             }),
             typeorm_1.TypeOrmModule.forFeature([article_entity_1.Article, user_entity_1.User, comment_entity_1.Comment]),
         ],

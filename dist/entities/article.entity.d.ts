@@ -8,4 +8,5 @@ export declare class Article {
     author: User;
     createdAt: Date;
     comments?: Comment[];
+    wordFrequencies: Record<string, number>;
 }

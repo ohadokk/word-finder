@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Article } from "./entities/article.entity";
 import { User } from "./entities/user.entity";
@@ -12,15 +13,20 @@ import { CommentController } from "./controllers/comment.controller";
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: "postgres",
-      host: "localhost",
-      port: 5432,
-      username: "postgres",
-      password: "postgres",
-      database: "infra_assignment",
-      autoLoadEntities: true,
-      synchronize: true, // Turn off in production!
+    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (config: ConfigService) => ({
+        type: "postgres",
+        host: config.getOrThrow<string>("POSTGRES_HOST"),
+        port: config.getOrThrow<number>("POSTGRES_PORT"),
+        username: config.getOrThrow<string>("POSTGRES_USER"),
+        password: config.getOrThrow<string>("POSTGRES_PASSWORD"),
+        database: config.getOrThrow<string>("POSTGRES_DB"),
+        autoLoadEntities: true,
+        synchronize: true, // Turn off in production!
+      }),
+      inject: [ConfigService],
     }),
     TypeOrmModule.forFeature([Article, User, Comment]),
   ],

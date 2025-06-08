@@ -10,7 +10,10 @@ export declare class ArticleController {
         offsets: number[];
     }[]>>;
     findMostCommon(word: string): Promise<{
-        article_id: string | null;
+        article_id: string;
+        count: number;
+    } | {
+        article_id: null;
         count: number;
     }>;
 }
