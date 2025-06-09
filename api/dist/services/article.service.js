@@ -18,41 +18,22 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const article_entity_1 = require("../entities/article.entity");
 const user_entity_1 = require("../entities/user.entity");
+const redis_service_1 = require("../redis.service");
 let ArticleService = class ArticleService {
-    constructor(articleRepo, userRepo) {
+    constructor(articleRepo, userRepo, publisher) {
         this.articleRepo = articleRepo;
         this.userRepo = userRepo;
-    }
-    buildOffsetMap(body) {
-        const map = {};
-        const lower = body.toLowerCase();
-        const wordRegex = /\b\w+\b/g;
-        let match;
-        while ((match = wordRegex.exec(lower)) !== null) {
-            const word = match[0];
-            const offset = match.index;
-            if (!map[word])
-                map[word] = [];
-            map[word].push(offset);
-        }
-        return map;
-    }
-    buildWordFrequencyMap(body) {
-        const map = {};
-        const words = body.toLowerCase().match(/\b\w+\b/g) || [];
-        for (const word of words) {
-            map[word] = (map[word] || 0) + 1;
-        }
-        return map;
+        this.publisher = publisher;
     }
     async create(dto) {
         const author = await this.userRepo.findOneByOrFail({ id: dto.authorId });
-        const wordOffsets = this.buildOffsetMap(dto.body);
-        const wordFrequencies = this.buildWordFrequencyMap(dto.body);
-        const article = this.articleRepo.create(Object.assign(Object.assign({}, dto), { author,
-            wordOffsets,
-            wordFrequencies }));
-        return await this.articleRepo.save(article);
+        const article = this.articleRepo.create(Object.assign(Object.assign({}, dto), { author }));
+        const saved = await this.articleRepo.save(article);
+        this.publisher.publishMessage('article_created', {
+            id: saved.id,
+            body: saved.body,
+        });
+        return saved;
     }
     async findOne(id) {
         return this.articleRepo.findOneByOrFail({ id });
@@ -96,7 +77,9 @@ exports.ArticleService = ArticleService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(article_entity_1.Article)),
     __param(1, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
+    __param(2, (0, common_1.Inject)()),
     __metadata("design:paramtypes", [typeorm_2.Repository,
-        typeorm_2.Repository])
+        typeorm_2.Repository,
+        redis_service_1.RedisService])
 ], ArticleService);
 //# sourceMappingURL=article.service.js.map

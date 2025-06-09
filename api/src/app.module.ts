@@ -10,12 +10,15 @@ import { CommentService } from "./services/comment.service";
 import { ArticleController } from "./controllers/article.controller";
 import { UserController } from "./controllers/user.controller";
 import { CommentController } from "./controllers/comment.controller";
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { RedisService } from "./redis.service";
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true,
+    ConfigModule.forRoot({
+      isGlobal: true,
       envFilePath: "../.env",
-     }),
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
@@ -26,13 +29,16 @@ import { CommentController } from "./controllers/comment.controller";
         password: config.getOrThrow<string>("POSTGRES_PASSWORD"),
         database: config.getOrThrow<string>("POSTGRES_DB"),
         autoLoadEntities: true,
-        synchronize: true, // Turn off in production!
+        synchronize: true,
       }),
       inject: [ConfigService],
     }),
+
     TypeOrmModule.forFeature([Article, User, Comment]),
   ],
   controllers: [ArticleController, UserController, CommentController],
-  providers: [ArticleService, UserService, CommentService],
+
+  // ✅ These come AFTER imports, so everything is resolved correctly
+  providers: [ArticleService, UserService, CommentService, RedisService],
 })
 export class AppModule {}

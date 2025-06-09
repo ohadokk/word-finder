@@ -19,13 +19,15 @@ const comment_service_1 = require("./services/comment.service");
 const article_controller_1 = require("./controllers/article.controller");
 const user_controller_1 = require("./controllers/user.controller");
 const comment_controller_1 = require("./controllers/comment.controller");
+const redis_service_1 = require("./redis.service");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            config_1.ConfigModule.forRoot({ isGlobal: true,
+            config_1.ConfigModule.forRoot({
+                isGlobal: true,
                 envFilePath: "../.env",
             }),
             typeorm_1.TypeOrmModule.forRootAsync({
@@ -45,7 +47,7 @@ exports.AppModule = AppModule = __decorate([
             typeorm_1.TypeOrmModule.forFeature([article_entity_1.Article, user_entity_1.User, comment_entity_1.Comment]),
         ],
         controllers: [article_controller_1.ArticleController, user_controller_1.UserController, comment_controller_1.CommentController],
-        providers: [article_service_1.ArticleService, user_service_1.UserService, comment_service_1.CommentService],
+        providers: [article_service_1.ArticleService, user_service_1.UserService, comment_service_1.CommentService, redis_service_1.RedisService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

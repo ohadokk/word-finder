@@ -1,52 +1,35 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { Article } from "../entities/article.entity";
-import { CreateArticleDto } from "../dto/create-article.dto";
-import { User } from "../entities/user.entity";
+import { Inject, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Article } from '../entities/article.entity';
+import { CreateArticleDto } from '../dto/create-article.dto';
+import { User } from '../entities/user.entity';
+import { RedisService } from 'src/redis.service';
 
 @Injectable()
 export class ArticleService {
   constructor(
     @InjectRepository(Article) private articleRepo: Repository<Article>,
-    @InjectRepository(User) private userRepo: Repository<User>
+    @InjectRepository(User) private userRepo: Repository<User>,
+    @Inject() private publisher: RedisService,
   ) {}
-
-  private buildOffsetMap(body: string): Record<string, number[]> {
-    const map: Record<string, number[]> = {};
-    const lower = body.toLowerCase();
-    const wordRegex = /\b\w+\b/g;
-    let match;
-    while ((match = wordRegex.exec(lower)) !== null) {
-      const word = match[0];
-      const offset = match.index;
-      if (!map[word]) map[word] = [];
-      map[word].push(offset);
-    }
-    return map;
-  }
-
-  private buildWordFrequencyMap(body: string): Record<string, number> {
-    const map: Record<string, number> = {};
-    const words = body.toLowerCase().match(/\b\w+\b/g) || [];
-    for (const word of words) {
-      map[word] = (map[word] || 0) + 1;
-    }
-    return map;
-  }
 
   async create(dto: CreateArticleDto): Promise<Article> {
     const author = await this.userRepo.findOneByOrFail({ id: dto.authorId });
-    const wordOffsets = this.buildOffsetMap(dto.body);
-    const wordFrequencies = this.buildWordFrequencyMap(dto.body);
-   const article = this.articleRepo.create({
+
+    const article = this.articleRepo.create({
       ...dto,
       author,
-      wordOffsets,
-      wordFrequencies,
     });
 
-    return await this.articleRepo.save(article);
+    const saved = await this.articleRepo.save(article);
+
+    this.publisher.publishMessage('article_created', {
+      id: saved.id,
+      body: saved.body,
+    });
+
+    return saved;
   }
 
   async findOne(id: string): Promise<Article> {
@@ -91,3 +74,6 @@ export class ArticleService {
     return result || { article_id: null, count: 0 };
   }
 }
+
+
+

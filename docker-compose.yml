@@ -1,22 +1,39 @@
 version: '3.9'
 
 services:
-  # app:
-  #   build: .
-  #   container_name: nest-app
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     DB_HOST: db
-  #     DB_PORT: 5432
-  #     DB_USERNAME: postgres
-  #     DB_PASSWORD: postgres
-  #     DB_NAME: infra_assignment
-  #   depends_on:
-  #     - db
-  #   volumes:
-  #     - .:/app
-  #     - /app/node_modules
+  redis:
+    image: redis:6
+    ports:
+      - "6379:6379"
+
+  api:
+    build: ./api
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/articles
+      REDIS_URL: redis
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: infra_assignment
+    depends_on:
+      - db
+      - redis
+
+  worker:
+    build: ./worker
+    environment:
+      REDIS_URL: redis://redis:6379
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: infra_assignment
+    depends_on:
+      - db
+      - redis
 
   db:
     image: postgres:14
