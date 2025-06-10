@@ -13,6 +13,9 @@ export class Article {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
+  @Column({ type: 'tsvector', select: false, nullable: true })
+  body_tsvector?: string;
+
   @Column("jsonb", { nullable: false, default: {} })
   wordOffsets!: Record<string, number[]>;
 

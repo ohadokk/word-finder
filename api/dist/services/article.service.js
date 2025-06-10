@@ -16,9 +16,9 @@ exports.ArticleService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const article_entity_1 = require("../entities/article.entity");
 const user_entity_1 = require("../entities/user.entity");
 const redis_service_1 = require("../redis.service");
+const article_repository_1 = require("../repositories/article.repository");
 let ArticleService = class ArticleService {
     constructor(articleRepo, userRepo, publisher) {
         this.articleRepo = articleRepo;
@@ -27,22 +27,21 @@ let ArticleService = class ArticleService {
     }
     async create(dto) {
         const author = await this.userRepo.findOneByOrFail({ id: dto.authorId });
-        const article = this.articleRepo.create(Object.assign(Object.assign({}, dto), { author }));
-        const saved = await this.articleRepo.save(article);
-        this.publisher.publishMessage('article_created', {
+        const saved = await this.articleRepo.save(author, dto);
+        this.publisher.publishMessage("article_created", {
             id: saved.id,
             body: saved.body,
         });
-        return saved;
+        return this.toArticleResponseDto(saved);
     }
     async findOne(id) {
-        return this.articleRepo.findOneByOrFail({ id });
+        return await this.articleRepo.findOneWithRelationsDto(id);
     }
     async findAll() {
-        return this.articleRepo.find();
+        return await this.articleRepo.findAllWithRelationsDto();
     }
     async findWords(words) {
-        const articles = await this.articleRepo.find();
+        const articles = await this.articleRepo.getArticlesByWords(words);
         const result = {};
         for (const word of words.map((w) => w.toLowerCase())) {
             for (const article of articles) {
@@ -58,8 +57,8 @@ let ArticleService = class ArticleService {
     }
     async findMostCommon(word) {
         var _a;
-        const wordLower = word.toLowerCase();
-        const articles = await this.articleRepo.find();
+        const wordLower = word.toLowerCase().replace(/[':]/g, "");
+        const articles = await this.articleRepo.getArticlesByWord(word);
         let maxCount = 0;
         let result = null;
         for (const article of articles) {
@@ -71,14 +70,33 @@ let ArticleService = class ArticleService {
         }
         return result || { article_id: null, count: 0 };
     }
+    toArticleResponseDto(article) {
+        return {
+            id: article.id,
+            title: article.title,
+            body: article.body,
+            createdAt: article.createdAt,
+            author: {
+                id: article.author.id,
+                username: article.author.name,
+            },
+            comments: article.comments
+                ? article.comments.map((c) => ({
+                    id: c.id,
+                    content: c.content,
+                    createdAt: c.createdAt,
+                }))
+                : [],
+        };
+    }
 };
 exports.ArticleService = ArticleService;
 exports.ArticleService = ArticleService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, typeorm_1.InjectRepository)(article_entity_1.Article)),
+    __param(0, (0, common_1.Inject)()),
     __param(1, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
     __param(2, (0, common_1.Inject)()),
-    __metadata("design:paramtypes", [typeorm_2.Repository,
+    __metadata("design:paramtypes", [article_repository_1.ArticleRepository,
         typeorm_2.Repository,
         redis_service_1.RedisService])
 ], ArticleService);

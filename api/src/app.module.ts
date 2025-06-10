@@ -1,17 +1,18 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { Article } from "./entities/article.entity";
 import { User } from "./entities/user.entity";
 import { Comment } from "./entities/comment.entity";
-import { ArticleService } from "./services/article.service";
 import { UserService } from "./services/user.service";
 import { CommentService } from "./services/comment.service";
-import { ArticleController } from "./controllers/article.controller";
 import { UserController } from "./controllers/user.controller";
 import { CommentController } from "./controllers/comment.controller";
-import { ClientsModule, Transport } from '@nestjs/microservices';
 import { RedisService } from "./redis.service";
+import { ArticleRepository } from "./repositories/article.repository";
+import { Article } from "./entities/article.entity";
+import { ArticleService } from "./services/article.service";
+import { ArticleController } from "./controllers/article.controller";
+import { DataSource } from "typeorm";
 
 @Module({
   imports: [
@@ -33,12 +34,15 @@ import { RedisService } from "./redis.service";
       }),
       inject: [ConfigService],
     }),
-
-    TypeOrmModule.forFeature([Article, User, Comment]),
+    TypeOrmModule.forFeature([User, Comment, Article]),
   ],
-  controllers: [ArticleController, UserController, CommentController],
-
-  // ✅ These come AFTER imports, so everything is resolved correctly
-  providers: [ArticleService, UserService, CommentService, RedisService],
+  controllers: [UserController, CommentController, ArticleController],
+  providers: [
+    UserService,
+    CommentService,
+    ArticleService,
+    RedisService,
+    ArticleRepository,
+  ],
 })
 export class AppModule {}

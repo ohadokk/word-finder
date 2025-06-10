@@ -1,22 +1,26 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 import { Article } from "./entities/article.entity";
-
-
 
 @Injectable()
 export class ArticleProcessorService {
   constructor(
     @InjectRepository(Article)
-    private readonly articleRepo: Repository<Article>,
+    private readonly articleRepo: Repository<Article>
   ) {}
 
   async process(id: string, body: string) {
     const wordOffsets = this.buildOffsetMap(body);
     const wordFrequencies = this.buildWordFrequencyMap(body);
-    console.log("here")
-    await this.articleRepo.update(id, { wordOffsets, wordFrequencies });
+    console.log("here");
+
+    await this.articleRepo.update(id, {
+      wordOffsets,
+      wordFrequencies,
+      body_tsvector: () =>
+        `to_tsvector('english', '${body.replace(/'/g, "''")}')`,
+    });
   }
 
   private buildOffsetMap(body: string): Record<string, number[]> {

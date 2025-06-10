@@ -1,48 +1,48 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Article } from '../entities/article.entity';
-import { CreateArticleDto } from '../dto/create-article.dto';
-import { User } from '../entities/user.entity';
-import { RedisService } from 'src/redis.service';
+import { Injectable, Inject } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Article } from "../entities/article.entity";
+import { CreateArticleDto } from "../dto/create-article.dto";
+import { User } from "../entities/user.entity";
+import { RedisService } from "src/redis.service";
+import { ArticleRepository } from "../repositories/article.repository";
+import { ArticleResponseDto } from "../dto/article-response.dto";
 
 @Injectable()
 export class ArticleService {
   constructor(
-    @InjectRepository(Article) private articleRepo: Repository<Article>,
+    @Inject() private articleRepo: ArticleRepository,
     @InjectRepository(User) private userRepo: Repository<User>,
-    @Inject() private publisher: RedisService,
+    @Inject() private publisher: RedisService
   ) {}
 
-  async create(dto: CreateArticleDto): Promise<Article> {
+  async create(dto: CreateArticleDto): Promise<ArticleResponseDto> {
     const author = await this.userRepo.findOneByOrFail({ id: dto.authorId });
 
-    const article = this.articleRepo.create({
-      ...dto,
-      author,
-    });
+    const saved = await this.articleRepo.save(author, dto);
 
-    const saved = await this.articleRepo.save(article);
-
-    this.publisher.publishMessage('article_created', {
+    this.publisher.publishMessage("article_created", {
       id: saved.id,
       body: saved.body,
     });
 
-    return saved;
+    return this.toArticleResponseDto(saved);
   }
 
-  async findOne(id: string): Promise<Article> {
-    return this.articleRepo.findOneByOrFail({ id });
+  async findOne(id: string): Promise<ArticleResponseDto> {
+    return await this.articleRepo.findOneWithRelationsDto(id);
   }
 
-  async findAll(): Promise<Article[]> {
-    return this.articleRepo.find();
+  async findAll(): Promise<ArticleResponseDto[]> {
+    return await this.articleRepo.findAllWithRelationsDto();
   }
 
   async findWords(words: string[]) {
-    const articles = await this.articleRepo.find();
-    const result: Record<string, { article_id: string; offsets: number[] }[]> = {};
+
+    const articles = await this.articleRepo.getArticlesByWords(words)
+
+    const result: Record<string, { article_id: string; offsets: number[] }[]> =
+      {};
 
     for (const word of words.map((w) => w.toLowerCase())) {
       for (const article of articles) {
@@ -57,8 +57,10 @@ export class ArticleService {
   }
 
   async findMostCommon(word: string) {
-    const wordLower = word.toLowerCase();
-    const articles = await this.articleRepo.find();
+    const wordLower = word.toLowerCase().replace(/[':]/g, "");
+
+    const articles = await this.articleRepo.getArticlesByWord(word)
+  
 
     let maxCount = 0;
     let result: { article_id: string; count: number } | null = null;
@@ -73,7 +75,24 @@ export class ArticleService {
 
     return result || { article_id: null, count: 0 };
   }
+
+  private toArticleResponseDto(article: Article): ArticleResponseDto {
+    return {
+      id: article.id,
+      title: article.title,
+      body: article.body,
+      createdAt: article.createdAt,
+      author: {
+        id: article.author.id,
+        username: article.author.name,
+      },
+      comments: article.comments
+        ? article.comments.map((c) => ({
+            id: c.id,
+            content: c.content,
+            createdAt: c.createdAt,
+          }))
+        : [],
+    };
+  }
 }
-
-
-

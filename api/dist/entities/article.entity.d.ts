@@ -4,9 +4,10 @@ export declare class Article {
     id: string;
     title: string;
     body: string;
-    wordOffsets: Record<string, number[]>;
+    body_tsvector?: string;
     author: User;
     createdAt: Date;
     comments?: Comment[];
+    wordOffsets: Record<string, number[]>;
     wordFrequencies: Record<string, number>;
 }

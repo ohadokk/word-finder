@@ -10,16 +10,17 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const typeorm_1 = require("@nestjs/typeorm");
-const article_entity_1 = require("./entities/article.entity");
 const user_entity_1 = require("./entities/user.entity");
 const comment_entity_1 = require("./entities/comment.entity");
-const article_service_1 = require("./services/article.service");
 const user_service_1 = require("./services/user.service");
 const comment_service_1 = require("./services/comment.service");
-const article_controller_1 = require("./controllers/article.controller");
 const user_controller_1 = require("./controllers/user.controller");
 const comment_controller_1 = require("./controllers/comment.controller");
 const redis_service_1 = require("./redis.service");
+const article_repository_1 = require("./repositories/article.repository");
+const article_entity_1 = require("./entities/article.entity");
+const article_service_1 = require("./services/article.service");
+const article_controller_1 = require("./controllers/article.controller");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -44,10 +45,16 @@ exports.AppModule = AppModule = __decorate([
                 }),
                 inject: [config_1.ConfigService],
             }),
-            typeorm_1.TypeOrmModule.forFeature([article_entity_1.Article, user_entity_1.User, comment_entity_1.Comment]),
+            typeorm_1.TypeOrmModule.forFeature([user_entity_1.User, comment_entity_1.Comment, article_entity_1.Article]),
         ],
-        controllers: [article_controller_1.ArticleController, user_controller_1.UserController, comment_controller_1.CommentController],
-        providers: [article_service_1.ArticleService, user_service_1.UserService, comment_service_1.CommentService, redis_service_1.RedisService],
+        controllers: [user_controller_1.UserController, comment_controller_1.CommentController, article_controller_1.ArticleController],
+        providers: [
+            user_service_1.UserService,
+            comment_service_1.CommentService,
+            article_service_1.ArticleService,
+            redis_service_1.RedisService,
+            article_repository_1.ArticleRepository,
+        ],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

@@ -25,15 +25,16 @@ __decorate([
     __metadata("design:type", String)
 ], Article.prototype, "title", void 0);
 __decorate([
-    (0, typeorm_1.Column)("text"),
+    (0, typeorm_1.Column)({ type: 'text', nullable: false }),
     __metadata("design:type", String)
 ], Article.prototype, "body", void 0);
 __decorate([
-    (0, typeorm_1.Column)("jsonb", { nullable: false, default: {} }),
-    __metadata("design:type", Object)
-], Article.prototype, "wordOffsets", void 0);
+    (0, typeorm_1.Column)({ type: 'tsvector', select: false, nullable: true }),
+    __metadata("design:type", String)
+], Article.prototype, "body_tsvector", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.articles, { eager: true }),
+    (0, typeorm_1.JoinColumn)({ name: 'author_id' }),
     __metadata("design:type", user_entity_1.User)
 ], Article.prototype, "author", void 0);
 __decorate([
@@ -44,6 +45,10 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => comment_entity_1.Comment, (comment) => comment.article),
     __metadata("design:type", Array)
 ], Article.prototype, "comments", void 0);
+__decorate([
+    (0, typeorm_1.Column)("jsonb", { nullable: false, default: {} }),
+    __metadata("design:type", Object)
+], Article.prototype, "wordOffsets", void 0);
 __decorate([
     (0, typeorm_1.Column)("jsonb", { nullable: false, default: {} }),
     __metadata("design:type", Object)
