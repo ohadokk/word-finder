@@ -4,7 +4,7 @@ import { Repository } from "typeorm";
 import { Article } from "../entities/article.entity";
 import { CreateArticleDto } from "../dto/create-article.dto";
 import { User } from "../entities/user.entity";
-import { RedisService } from "src/redis.service";
+import { RedisService } from "../redis.service";
 import { ArticleRepository } from "../repositories/article.repository";
 import { ArticleResponseDto } from "../dto/article-response.dto";
 
