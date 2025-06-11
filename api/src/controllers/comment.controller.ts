@@ -7,12 +7,17 @@ export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
   @Post()
-  create(@Body() dto: CreateCommentDto) {
+  public create(@Body() dto: CreateCommentDto) {
     return this.commentService.create(dto);
   }
 
   @Get(":id")
-  findOne(@Param("id") id: string) {
+  public findOne(@Param("id") id: string) {
     return this.commentService.findOne(id);
+  }
+
+  @Get("article/:articleId")
+  public findAllByArticleId(@Param("articleId") articleId: string) {
+    return this.commentService.findAllByArticleId(articleId);
   }
 }

@@ -16,7 +16,7 @@ export class ArticleService {
     @Inject() private publisher: RedisService
   ) {}
 
-  async create(dto: CreateArticleDto): Promise<ArticleResponseDto> {
+  public async create(dto: CreateArticleDto): Promise<ArticleResponseDto> {
     const author = await this.userRepo.findOneByOrFail({ id: dto.authorId });
 
     const saved = await this.articleRepo.save(author, dto);
@@ -29,24 +29,23 @@ export class ArticleService {
     return this.toArticleResponseDto(saved);
   }
 
-  async findOne(id: string): Promise<ArticleResponseDto> {
+  public async findOne(id: string): Promise<ArticleResponseDto> {
     return await this.articleRepo.findOneWithRelationsDto(id);
   }
 
-  async findAll(): Promise<ArticleResponseDto[]> {
+  public async findAll(): Promise<ArticleResponseDto[]> {
     return await this.articleRepo.findAllWithRelationsDto();
   }
 
-  async findWords(words: string[]) {
-
-    const articles = await this.articleRepo.getArticlesByWords(words)
+  public async findWords(words: string[]) {
+    const articles = await this.articleRepo.getArticlesByWords(words);
 
     const result: Record<string, { article_id: string; offsets: number[] }[]> =
       {};
 
     for (const word of words.map((w) => w.toLowerCase())) {
       for (const article of articles) {
-        const offsets = article.wordOffsets[word];
+        const offsets = article.wordOffsets? article.wordOffsets[word] : [];
         if (offsets && offsets.length > 0) {
           if (!result[word]) result[word] = [];
           result[word].push({ article_id: article.id, offsets });
@@ -56,11 +55,10 @@ export class ArticleService {
     return result;
   }
 
-  async findMostCommon(word: string) {
+  public async findMostCommon(word: string) {
     const wordLower = word.toLowerCase().replace(/[':]/g, "");
 
-    const articles = await this.articleRepo.getArticlesByWord(word)
-  
+    const articles = await this.articleRepo.getArticlesByWord(word);
 
     let maxCount = 0;
     let result: { article_id: string; count: number } | null = null;

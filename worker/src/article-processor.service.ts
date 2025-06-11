@@ -10,7 +10,7 @@ export class ArticleProcessorService {
     private readonly articleRepo: Repository<Article>
   ) {}
 
-  async process(id: string, body: string) {
+  public async process(id: string, body: string) {
     const wordOffsets = this.buildOffsetMap(body);
     const wordFrequencies = this.buildWordFrequencyMap(body);
     console.log("here");

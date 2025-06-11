@@ -8,11 +8,11 @@ import { CreateUserDto } from "../dto/create-user.dto";
 export class UserService {
   constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
 
-  create(dto: CreateUserDto) {
+  public create(dto: CreateUserDto) {
     return this.userRepo.save(this.userRepo.create(dto));
   }
 
-  findOne(id: string) {
+  public findOne(id: string) {
     return this.userRepo.findOneBy({ id });
   }
 }

@@ -17,9 +17,9 @@ export class Article {
   body_tsvector?: string;
 
   @Column("jsonb", { nullable: false, default: {} })
-  wordOffsets!: Record<string, number[]>;
+  wordOffsets?: Record<string, number[]>;
 
 
   @Column("jsonb", { nullable: false, default: {} })
-  wordFrequencies!: Record<string, number>;
+  wordFrequencies?: Record<string, number>;
 }

@@ -4,7 +4,7 @@ import { Repository } from "typeorm";
 import { Article } from "../entities/article.entity";
 import { ArticleResponseDto } from "../dto/article-response.dto";
 import { User } from "src/entities/user.entity";
-import { CreateArticleDto } from '../dto/create-article.dto'
+import { CreateArticleDto } from "../dto/create-article.dto";
 
 @Injectable()
 export class ArticleRepository {
@@ -14,16 +14,16 @@ export class ArticleRepository {
   ) {}
 
   private getArticleSelectFields() {
-  return [
-    "article.id AS id",
-    "article.title AS title",
-    "article.body AS body",
-    'article."createdAt" AS "createdAt"',
-    `jsonb_build_object(
+    return [
+      "article.id AS id",
+      "article.title AS title",
+      "article.body AS body",
+      'article."createdAt" AS "createdAt"',
+      `jsonb_build_object(
       'id', author.id,
       'username', author.name
     ) AS author`,
-    `COALESCE(
+      `COALESCE(
       json_agg(
         DISTINCT jsonb_build_object(
           'id', comment.id,
@@ -32,10 +32,11 @@ export class ArticleRepository {
         )
       ) FILTER (WHERE comment.id IS NOT NULL), '[]'
     ) AS comments`,
-  ];
-}
-
-  async findOneWithRelationsDto(id: string): Promise<ArticleResponseDto> {
+    ];
+  }
+  public async findOneWithRelationsDto(
+    id: string
+  ): Promise<ArticleResponseDto> {
     const raw = await this.repo
       .createQueryBuilder("article")
       .leftJoin("article.author", "author")
@@ -48,7 +49,7 @@ export class ArticleRepository {
     return raw as ArticleResponseDto;
   }
 
-  async findAllWithRelationsDto(): Promise<ArticleResponseDto[]> {
+  public async findAllWithRelationsDto(): Promise<ArticleResponseDto[]> {
     const raws = await this.repo
       .createQueryBuilder("article")
       .leftJoin("article.author", "author")
@@ -85,7 +86,7 @@ export class ArticleRepository {
   }
 
   public async save(author: User, dto: CreateArticleDto): Promise<Article> {
-       const article = this.repo.create({
+    const article = this.repo.create({
       ...dto,
       author,
     });

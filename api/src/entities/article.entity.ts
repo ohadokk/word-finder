@@ -25,7 +25,7 @@ export class Article {
   body_tsvector?: string;
 
   @ManyToOne(() => User, (user) => user.articles, { eager: true })
-  @JoinColumn({ name: 'author_id' })
+  @JoinColumn()
   author!: User;
 
   @CreateDateColumn()
@@ -35,8 +35,8 @@ export class Article {
   comments?: Comment[];
 
   @Column("jsonb", { nullable: false, default: {} })
-  wordOffsets!: Record<string, number[]>;
+  wordOffsets?: Record<string, number[]>;
 
   @Column("jsonb", { nullable: false, default: {} })
-  wordFrequencies!: Record<string, number>;
+  wordFrequencies?: Record<string, number>;
 }

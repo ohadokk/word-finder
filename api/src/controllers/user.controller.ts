@@ -7,12 +7,12 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  create(@Body() dto: CreateUserDto) {
+  public create(@Body() dto: CreateUserDto) {
     return this.userService.create(dto);
   }
 
   @Get(":id")
-  findOne(@Param("id") id: string) {
+  public findOne(@Param("id") id: string) {
     return this.userService.findOne(id);
   }
 }

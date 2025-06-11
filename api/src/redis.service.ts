@@ -15,7 +15,7 @@ export class RedisService {
     });
   }
 
- publishMessage(eventName: string, {
+ public publishMessage(eventName: string, {
       id,
       body,
     }: { id: string, body: any }): void {
