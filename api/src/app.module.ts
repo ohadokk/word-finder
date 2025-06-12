@@ -12,7 +12,7 @@ import { ArticleRepository } from "./repositories/article.repository";
 import { Article } from "./entities/article.entity";
 import { ArticleService } from "./services/article.service";
 import { ArticleController } from "./controllers/article.controller";
-import { DataSource } from "typeorm";
+import { GinIndexInitService } from './startup/gin-index-init.service';
 
 @Module({
   imports: [
@@ -43,6 +43,7 @@ import { DataSource } from "typeorm";
     ArticleService,
     RedisService,
     ArticleRepository,
+    GinIndexInitService
   ],
 })
 export class AppModule {}

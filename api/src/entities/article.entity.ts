@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { User } from "./user.entity";
 import { Comment } from "./comment.entity";
+import { truncate } from "node:fs";
 
 @Entity()
 export class Article {
@@ -34,9 +35,9 @@ export class Article {
   @OneToMany(() => Comment, (comment: Comment) => comment.article)
   comments?: Comment[];
 
-  @Column("jsonb", { nullable: false, default: {} })
+  @Column("jsonb", { nullable: true, default: {} })
   wordOffsets?: Record<string, number[]>;
 
-  @Column("jsonb", { nullable: false, default: {} })
+  @Column("jsonb", { nullable: true, default: {} })
   wordFrequencies?: Record<string, number>;
 }

@@ -16,10 +16,10 @@ export class Article {
   @Column({ type: 'tsvector', select: false, nullable: true })
   body_tsvector?: string;
 
-  @Column("jsonb", { nullable: false, default: {} })
+  @Column("jsonb", { nullable: true, default: {} })
   wordOffsets?: Record<string, number[]>;
 
 
-  @Column("jsonb", { nullable: false, default: {} })
+  @Column("jsonb", { nullable: true, default: {} })
   wordFrequencies?: Record<string, number>;
 }
