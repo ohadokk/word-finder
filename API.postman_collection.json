@@ -1,0 +1,188 @@
+{
+	"info": {
+		"_postman_id": "3efee69e-8d99-4ef6-83cc-bcd94ce29c62",
+		"name": "API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "30506275"
+	},
+	"item": [
+		{
+			"name": "Create User",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"name\": \"Alice\", \"email\": \"alice@example.com\"}"
+				},
+				"url": "localhost:3000/users"
+			},
+			"response": []
+		},
+		{
+			"name": "Get User",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/users/:userId",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						":userId"
+					],
+					"variable": [
+						{
+							"key": "userId"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Article",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"title\": \"My First Article\", \"body\": \"hello Ipsum hello is simply dummy text of the printing industry\", \"authorId\": \":userId\"}"
+				},
+				"url": "localhost:3000/articles"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Article",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/articles/:articleId",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"articles",
+						":articleId"
+					],
+					"variable": [
+						{
+							"key": "articleId"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Comment",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"content\": \"Nice article!\", \"userId\": \":userId\", \"articleId\": \":articleId\"}"
+				},
+				"url": "localhost:3000/comments"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Comment",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/comments/:commentId",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"comments",
+						":commentId"
+					],
+					"variable": [
+						{
+							"key": "commentId"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search Words in Articles",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"words\": [\"hello\", \"simply\", \"print\"]}"
+				},
+				"url": "localhost:3000/articles/search"
+			},
+			"response": []
+		},
+		{
+			"name": "Most Common Word",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/articles/most-common?word=hello",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"articles",
+						"most-common"
+					],
+					"query": [
+						{
+							"key": "word",
+							"value": "hello"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Article`s comments ",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3000/comments/article/781797ce-3693-4bdf-bb59-093935061c1a"
+			},
+			"response": []
+		}
+	]
+}

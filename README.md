@@ -25,7 +25,9 @@ This project is a microservices-based article and comment platform built with [N
 
    This will start the API, worker, Redis, and PostgreSQL containers.
 
-3. **API Endpoints**:  
+3. **API Endpoints**:
+
+   > **You can find a ready-to-use Postman collection for all endpoints in [API.postman_collection.json](./API.postman_collection.json) at the project root.**
 
    ```http
    # Users
